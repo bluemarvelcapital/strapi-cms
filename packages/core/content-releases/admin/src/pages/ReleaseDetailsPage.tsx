@@ -27,7 +27,6 @@ import {
 } from '@strapi/design-system';
 import { LinkButton, Menu } from '@strapi/design-system/v2';
 import {
-  CheckPermissions,
   useAPIErrorHandler,
   useNotification,
   useQueryParams,
@@ -66,7 +65,6 @@ import type {
   ReleaseAction,
   ReleaseActionGroupBy,
   ReleaseActionEntry,
-  FormattedReleaseAction,
 } from '../../../shared/contracts/release-actions';
 import type { Schema } from '@strapi/types';
 
@@ -231,7 +229,7 @@ const ReleaseDetailsLayout = ({
   const toggleNotification = useNotification();
   const { formatAPIError } = useAPIErrorHandler();
   const {
-    allowedActions: { canUpdate, canDelete },
+    allowedActions: { canUpdate, canDelete, canPublish },
   } = useRBAC(PERMISSIONS);
   const dispatch = useTypedDispatch();
   const { trackUsage } = useTracking();
@@ -457,7 +455,7 @@ const ReleaseDetailsLayout = ({
                   defaultMessage: 'Refresh',
                 })}
               </Button>
-              <CheckPermissions permissions={PERMISSIONS.publish}>
+              {canPublish ? (
                 <Button
                   size="S"
                   variant="default"
@@ -470,7 +468,7 @@ const ReleaseDetailsLayout = ({
                     defaultMessage: 'Publish',
                   })}
                 </Button>
-              </CheckPermissions>
+              ) : null}
             </Flex>
           )
         }
@@ -843,7 +841,7 @@ const ReleaseDetailsPage = () => {
     }
   );
   const [updateRelease, { isLoading: isSubmittingForm }] = useUpdateReleaseMutation();
-  const [deleteRelease, { isLoading: isDeletingRelease }] = useDeleteReleaseMutation();
+  const [deleteRelease] = useDeleteReleaseMutation();
 
   const toggleEditReleaseModal = () => {
     setReleaseModalShown((prev) => !prev);
